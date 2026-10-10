@@ -1,8 +1,7 @@
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
-import { TanStackDevtools } from "@tanstack/react-devtools"
+import { HeadContent, createRootRoute } from "@tanstack/react-router"
 
 import appCss from "../styles.css?url"
+import Navbar from "@/components/navbar"
 
 export const Route = createRootRoute({
   head: () => ({
@@ -36,24 +35,13 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-br">
       <head>
         <HeadContent />
       </head>
-      <body>
-        {children}
-        <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
-        <Scripts />
+      <Navbar />
+      <body className="bg-linear-to-b from-slate-100 to-transparent">
+        {children};
       </body>
     </html>
   )
