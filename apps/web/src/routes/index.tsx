@@ -1,33 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router"
-
-import { MoreHorizontalIcon, Search } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
 
 import type { ProductProps } from "@/types/product"
 
-import Modal from "@/components/my-modal"
 import PaginationComponent from "@/components/pagination-component"
 import { fetchProducts } from "@/hooks/useFetchProducts"
 import { Field } from "@workspace/ui/components/field"
 import { ButtonGroup } from "@workspace/ui/components/button-group"
 import { Input } from "@workspace/ui/components/input"
 import { Button } from "@workspace/ui/components/button"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@workspace/ui/components/table"
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu"
+import { ListTable } from "@/components/list-table"
+import { Search } from "lucide-react"
+import PostModal from "@/components/post-modal"
+import { fetchCategories } from "@/hooks/useFetchCategories"
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -36,6 +21,13 @@ export const Route = createFileRoute("/")({
 
 function App() {
   const products: ProductProps[] = Route.useLoaderData()
+
+  const { data: categoires } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => await fetchCategories(),
+  })
+
+  console.log(categoires)
 
   return (
     <div className="flex min-h-svh justify-center p-6">
@@ -50,66 +42,11 @@ function App() {
             </ButtonGroup>
           </Field>
 
-          <Modal />
+          <PostModal />
         </div>
 
         <div className="flex items-center gap-2">
-          <Table className="border-rounded-lg rounded-lg bg-white shadow-lg">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="p-4">Nome</TableHead>
-                <TableHead>Descrição</TableHead>
-                <TableHead>SKU</TableHead>
-                <TableHead>Preço</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {products && products.length > 0 ? (
-                products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="p-4">{product.name}</TableCell>
-                    <TableCell>{product.description}</TableCell>
-                    <TableCell>{product.sku}</TableCell>
-                    <TableCell>R$ {product.price}</TableCell>
-                    {product.status === "ACTIVE" ? (
-                      <TableCell>Ativo</TableCell>
-                    ) : (
-                      <TableCell>Inativo</TableCell>
-                    )}
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8"
-                            >
-                              <MoreHorizontalIcon />
-                              <span className="sr-only">Open menu</span>
-                            </Button>
-                          }
-                        />
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem variant="destructive">
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <p>Nenhum produto cadastrado!</p>
-              )}
-            </TableBody>
-          </Table>
+          <ListTable products={products} />
         </div>
 
         <PaginationComponent />
