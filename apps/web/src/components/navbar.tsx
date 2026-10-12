@@ -2,27 +2,41 @@ import { Link } from "@tanstack/react-router"
 
 import { Button } from "@workspace/ui/components/button"
 import { Home } from "lucide-react"
+import { UserSetting } from "./user-setting"
 
 function Navbar() {
   return (
-    <div className="flex gap-2 bg-gray-300 p-2">
+    <div className="flex gap-2 bg-muted p-4 shadow-lg">
       <div className="flex items-center gap-2">
         <h1 className="text-lg font-extrabold">My Estoque</h1>
       </div>
 
       <div className="flex items-center gap-2">
         <Link to={"/"}>
-          <Button variant={"ghost"}>
-            <Home height={22} width={22} />
+          <Button className={"font-extrabold"} variant={"ghost"}>
             Home
           </Button>
         </Link>
       </div>
 
       <div className="flex items-center gap-2">
-        <Link to={"/about"}>
-          <Button variant={"ghost"}>About</Button>
+        <Link to={"/category-list"}>
+          <Button className={"font-extrabold"} variant={"ghost"}>
+            Categorias
+          </Button>
         </Link>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Link to={"/stock-list"}>
+          <Button className={"font-extrabold"} variant={"ghost"}>
+            Estoque
+          </Button>
+        </Link>
+      </div>
+
+      <div className="relative ml-auto flex cursor-pointer items-center gap-2">
+        <UserSetting />
       </div>
     </div>
   )

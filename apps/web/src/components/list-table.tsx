@@ -6,69 +6,43 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
+import type { ReactNode } from "react"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu"
-import { Button } from "@workspace/ui/components/button"
-import { MoreHorizontalIcon } from "lucide-react"
-import type { ProductProps } from "@/types/product"
-
-interface TableProps {
-  products: ProductProps[] | undefined
+interface ListTableProps<T> {
+  data: T[] | undefined
+  headers: string[]
+  renderRow: (item: T) => ReactNode
+  emptyMessage?: string
 }
 
-export function ListTable({ products }: TableProps) {
+export function ListTable<T>({
+  data,
+  headers,
+  renderRow,
+  emptyMessage = "Nenhum registro encontrado!",
+}: ListTableProps<T>) {
   return (
-    <Table className="border-rounded-lg rounded-lg bg-white shadow-lg">
+    <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="p-4">Nome</TableHead>
-          <TableHead>Descrição</TableHead>
-          <TableHead>SKU</TableHead>
-          <TableHead>Preço</TableHead>
-          <TableHead>Status</TableHead>
+          {headers.map((header) => (
+            <TableHead key={header} className="capitalize">
+              {header}
+            </TableHead>
+          ))}
           <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
 
       <TableBody>
-        {products && products.length > 0 ? (
-          products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell className="p-4">{product.name}</TableCell>
-              <TableCell>{product.description}</TableCell>
-              <TableCell>{product.sku}</TableCell>
-              <TableCell>R$ {product.price}</TableCell>
-              {product.status === "ACTIVE" ? (
-                <TableCell>Ativo</TableCell>
-              ) : (
-                <TableCell>Inativo</TableCell>
-              )}
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger
-                    render={
-                      <Button variant="ghost" size="icon" className="size-8">
-                        <MoreHorizontalIcon />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    }
-                  />
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem variant="destructive">Editar</DropdownMenuItem>
-                    <DropdownMenuItem>Deletar</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))
+        {data && data.length > 0 ? (
+          data.map((item) => renderRow(item))
         ) : (
-          <p>Nenhum produto cadastrado!</p>
+          <TableRow>
+            <TableCell colSpan={headers.length + 1} className="p-4 text-center">
+              {emptyMessage}
+            </TableCell>
+          </TableRow>
         )}
       </TableBody>
     </Table>

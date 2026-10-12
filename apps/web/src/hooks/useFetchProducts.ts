@@ -12,3 +12,22 @@ export async function fetchProducts(
     return undefined
   }
 }
+
+export async function postProduct(data: ProductProps): Promise<ProductProps | undefined> {
+  try {
+    const response = await fetch("http://localhost:3333/product", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) {
+      throw new Error("Failed to post product")
+    }
+    return response.json()
+  } catch (error) {
+    console.error(error)
+    return undefined
+  }
+}

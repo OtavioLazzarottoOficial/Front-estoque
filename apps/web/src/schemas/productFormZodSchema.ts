@@ -6,12 +6,13 @@ export const productFormZodSchema = z.object({
   id: z.uuid().optional(),
   name: z.string(),
   description: z.string(),
-  price: z.number(),
-  categoryId: z.uuid(),
+  sku: z.string().optional(),
+  price: z.coerce.number(),
+  categoryId: z.string(),
   status: z.enum(Status).optional(),
   category: z
     .object({
-      id: z.uuid(),
+      id: z.string(),
       name: z.string(),
     })
     .optional(),

@@ -10,7 +10,7 @@ import {
 
 export default function PaginationComponent() {
   return (
-    <Pagination className="border-rounded-lg rounded-lg bg-white shadow-lg p-2">
+    <Pagination className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white p-2 shadow-lg">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious href="#" />
