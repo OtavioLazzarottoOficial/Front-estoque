@@ -5,7 +5,7 @@ import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query
 import { RouterProvider, createRouter } from "@tanstack/react-router"
 import { routeTree } from "./routeTree.gen"
 import "@workspace/ui/globals.css"
-import { AuthProvider } from "./auth/auth"
+import { AuthProvider, useAuth } from "./auth/auth"
 
 const queryClient = new QueryClient()
 
@@ -37,7 +37,8 @@ declare module "@tanstack/react-router" {
 }
 
 function InnerApp() {
-  return <RouterProvider router={router} />
+  const auth = useAuth()
+  return <RouterProvider router={router} context={{ auth }} />
 }
 
 function App() {

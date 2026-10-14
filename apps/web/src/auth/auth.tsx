@@ -1,43 +1,51 @@
 import * as React from "react"
-import type { IAuth } from "./IAuth"
 import type { UserProps } from "@/types/user"
+import { jwtDecode } from "jwt-decode"
+import { useState } from "react"
 
-const AuthContext = React.createContext<IAuth | null>(null)
-
-const key = "tanstack.auth.user"
-
-function getStoredUser() {
-  return localStorage.getItem(key)
+interface AuthContextProps {
+  user: Omit<UserProps, "password"> | null
+  isAuthenticated: boolean
+  login: (token: string) => void
+  logout: () => void
+  isLoading: boolean
 }
 
-function setStoredUser(user: UserProps | null) {
-  if (user) {
-    localStorage.setItem(key, JSON.stringify(user))
-  } else {
-    localStorage.removeItem(key)
+const AuthContext = React.createContext<AuthContextProps | null>(null)
+
+function getInitialUser(): UserProps | null {
+  const token = localStorage.getItem("token")
+  if (!token) return null
+
+  const decoded = jwtDecode<UserProps & { exp: number }>(token)
+  const isExpired = decoded.exp * 1000 < Date.now()
+
+  if (isExpired) {
+    localStorage.removeItem("token")
+    return null
   }
+
+  return decoded
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = React.useState<string | null>(getStoredUser())
-  const isAuthenticated = !!user
+  const [user, setUser] = useState<UserProps | null>(getInitialUser)
 
-  const logout = React.useCallback(async () => {
-    setStoredUser(null)
+  function login(token: string) {
+    localStorage.setItem("token", token)
+    const decoded = jwtDecode<UserProps>(token)
+    setUser(decoded)
+  }
+
+  function logout() {
+    localStorage.removeItem("token")
     setUser(null)
-  }, [])
-
-  const login = React.useCallback(async (username: string) => {
-    setStoredUser(username)
-    setUser(username)
-  }, [])
-
-  React.useEffect(() => {
-    setUser(getStoredUser())
-  }, [])
+  }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated: !!user, login, logout, isLoading: false }}
+    >
       {children}
     </AuthContext.Provider>
   )
