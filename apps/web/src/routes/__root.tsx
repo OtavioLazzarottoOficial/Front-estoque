@@ -1,7 +1,12 @@
 import Navbar from "@/components/navbar"
-import { Outlet, createRootRoute } from "@tanstack/react-router"
+import { Outlet, createRootRouteWithContext } from "@tanstack/react-router"
 
-export const Route = createRootRoute({
+interface MyRouterContext {
+  // The ReturnType of your useAuth hook or the value of your AuthContext
+  auth: AuthState
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
 })
 

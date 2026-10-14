@@ -16,7 +16,7 @@ import { Input } from "@workspace/ui/components/input"
 import { TableCell, TableRow } from "@workspace/ui/components/table"
 import { MoreHorizontalIcon, Search } from "lucide-react"
 
-export const Route = createFileRoute("/category-list")({
+export const Route = createFileRoute("/_authenticated/category-list")({
   component: CategoryList,
   loader: async () => fetchCategories(),
 })

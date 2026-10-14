@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router"
 
 import { Button } from "@workspace/ui/components/button"
-import { Home } from "lucide-react"
 import { UserSetting } from "./user-setting"
 
 function Navbar() {
@@ -15,6 +14,14 @@ function Navbar() {
         <Link to={"/"}>
           <Button className={"font-extrabold"} variant={"ghost"}>
             Home
+          </Button>
+        </Link>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Link to={"/product-list"}>
+          <Button className={"font-extrabold"} variant={"ghost"}>
+            Produtos
           </Button>
         </Link>
       </div>
