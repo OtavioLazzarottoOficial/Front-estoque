@@ -1,10 +1,15 @@
 import * as React from "react"
-import type { UserProps } from "@/types/user"
 import { jwtDecode } from "jwt-decode"
 import { useState } from "react"
 
+type User = {
+  iat: number
+  user_id: string
+  user_email: string
+}
+
 interface AuthContextProps {
-  user: Omit<UserProps, "password"> | null
+  user: User | null
   isAuthenticated: boolean
   login: (token: string) => void
   logout: () => void
@@ -13,11 +18,11 @@ interface AuthContextProps {
 
 const AuthContext = React.createContext<AuthContextProps | null>(null)
 
-function getInitialUser(): UserProps | null {
+function getInitialUser(): User | null {
   const token = localStorage.getItem("token")
   if (!token) return null
 
-  const decoded = jwtDecode<UserProps & { exp: number }>(token)
+  const decoded = jwtDecode<User & { exp: number }>(token)
   const isExpired = decoded.exp * 1000 < Date.now()
 
   if (isExpired) {
@@ -29,11 +34,11 @@ function getInitialUser(): UserProps | null {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserProps | null>(getInitialUser)
+  const [user, setUser] = useState<User | null>(getInitialUser)
 
   function login(token: string) {
     localStorage.setItem("token", token)
-    const decoded = jwtDecode<UserProps>(token)
+    const decoded = jwtDecode<User>(token)
     setUser(decoded)
   }
 
