@@ -8,23 +8,34 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu"
-import { Settings } from "lucide-react"
+import { Settings, LucideSquareArrowRightExit } from "lucide-react"
 
-export function UserSetting() {
+interface UserSettingProps {
+  logout: () => void
+  user_email?: string | undefined
+}
+
+export function UserSetting({ logout, user_email }: UserSettingProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Settings className="h-6 w-6" />} />
+      <DropdownMenuTrigger
+        render={<Button className="font-extrabold" variant="ghost" />}
+      >
+        {user_email}
+        <Settings />
+      </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>Billing</DropdownMenuItem>
           <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+            <LucideSquareArrowRightExit />
+            Logout
+          </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>GitHub</DropdownMenuItem>
-        <DropdownMenuItem>Support</DropdownMenuItem>
-        <DropdownMenuItem disabled>API</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

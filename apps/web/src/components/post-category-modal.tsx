@@ -1,6 +1,6 @@
 import { postCategory } from "@/hooks/useFetchCategories"
 import { Button } from "@workspace/ui/components/button"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 
 import {
   Dialog,
@@ -21,13 +21,24 @@ import { Input } from "@workspace/ui/components/input"
 import { Plus } from "lucide-react"
 
 import { Controller, useForm } from "react-hook-form"
+import { useNavigate } from "@tanstack/react-router"
 
 export default function PostCategoryModal() {
   const { control, handleSubmit, setValue } = useForm()
 
+  const navigate = useNavigate()
+
   const { mutate } = useMutation({
     mutationKey: ["postCategory"],
     mutationFn: async (data) => await postCategory(data),
+
+    onSuccess: () => {
+      alert("Categoria cadastrada com sucesso!")
+      navigate({ to: "/category-list" })
+    },
+    onError: (error) => {
+      console.error("Erro ao cadastrar categoria:", error)
+    },
   })
 
   function onSubmit(data) {

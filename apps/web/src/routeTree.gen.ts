@@ -11,8 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedCategoryListRouteImport } from './routes/_authenticated/category-list'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProductListRouteImport } from './routes/_authenticated/product-list'
 import { Route as AuthenticatedStockListRouteImport } from './routes/_authenticated/stock-list'
 
@@ -25,17 +25,17 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedCategoryListRoute =
   AuthenticatedCategoryListRouteImport.update({
     id: '/category-list',
     path: '/category-list',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedProductListRoute =
   AuthenticatedProductListRouteImport.update({
     id: '/product-list',
@@ -50,15 +50,15 @@ const AuthenticatedStockListRoute = AuthenticatedStockListRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
   '/category-list': typeof AuthenticatedCategoryListRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/product-list': typeof AuthenticatedProductListRoute
   '/stock-list': typeof AuthenticatedStockListRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
   '/category-list': typeof AuthenticatedCategoryListRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/product-list': typeof AuthenticatedProductListRoute
   '/stock-list': typeof AuthenticatedStockListRoute
 }
@@ -66,22 +66,23 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/login': typeof LoginRoute
   '/_authenticated/category-list': typeof AuthenticatedCategoryListRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/product-list': typeof AuthenticatedProductListRoute
   '/_authenticated/stock-list': typeof AuthenticatedStockListRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/category-list' | '/product-list' | '/stock-list'
+  fullPaths:
+    '/' | '/category-list' | '/dashboard' | '/product-list' | '/stock-list'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/category-list' | '/product-list' | '/stock-list'
+  to: '/' | '/category-list' | '/dashboard' | '/product-list' | '/stock-list'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/login'
     | '/_authenticated/category-list'
+    | '/_authenticated/dashboard'
     | '/_authenticated/product-list'
     | '/_authenticated/stock-list'
   fileRoutesById: FileRoutesById
@@ -89,7 +90,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -108,18 +108,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/category-list': {
       id: '/_authenticated/category-list'
       path: '/category-list'
       fullPath: '/category-list'
       preLoaderRoute: typeof AuthenticatedCategoryListRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/product-list': {
@@ -141,12 +141,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedCategoryListRoute: typeof AuthenticatedCategoryListRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProductListRoute: typeof AuthenticatedProductListRoute
   AuthenticatedStockListRoute: typeof AuthenticatedStockListRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCategoryListRoute: AuthenticatedCategoryListRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProductListRoute: AuthenticatedProductListRoute,
   AuthenticatedStockListRoute: AuthenticatedStockListRoute,
 }
@@ -158,7 +160,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
