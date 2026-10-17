@@ -1,3 +1,4 @@
+import type { Product } from "@/models/product-model"
 import type { ProductProps } from "@/types/product"
 
 export async function fetchProducts(
@@ -13,7 +14,7 @@ export async function fetchProducts(
   }
 }
 
-export async function postProduct(data: ProductProps): Promise<ProductProps | undefined> {
+export async function postProduct(data: Product): Promise<ProductProps | undefined> {
   try {
     const response = await fetch("http://localhost:3333/product", {
       method: "POST",

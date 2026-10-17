@@ -1,7 +1,7 @@
 import { postProduct } from "@/hooks/useFetchProducts"
 import type { CategoryProps } from "@/types/category"
 import { Button } from "@workspace/ui/components/button"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import {
   Dialog,
   DialogClose,
@@ -29,27 +29,36 @@ import {
 import { Textarea } from "@workspace/ui/components/textarea"
 import { Plus } from "lucide-react"
 
-import { Controller, useForm } from "react-hook-form"
+import { Controller, useForm, type SubmitHandler } from "react-hook-form"
 import { productFormZodSchema } from "@/schemas/productFormZodSchema"
-import type z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { Product } from "@/models/product-model"
+import { useNavigate } from "@tanstack/react-router"
 interface PostModalProps {
   categories?: CategoryProps[] | undefined
 }
 
 export default function PostModal({ categories }: PostModalProps) {
-  const { control, handleSubmit, setValue } = useForm<
-    z.infer<typeof productFormZodSchema>
-  >({
+  const { control, handleSubmit, setValue } = useForm<Product>({
     resolver: zodResolver(productFormZodSchema),
+  })
+
+  const navigate = useNavigate()
+
+  const { refetch } = useQuery({
+    queryKey: ["products"],
   })
 
   const { mutate } = useMutation({
     mutationKey: ["postProduct"],
-    mutationFn: async (data) => await postProduct(data),
+    mutationFn: async (data: Product) => await postProduct(data),
+    onSuccess: () => {
+      navigate({ to: "/product-list" })
+      refetch()
+    },
   })
 
-  function onSubmit(data) {
+  const onSubmit: SubmitHandler<Product> = (data) => {
     mutate(data)
     setValue("name", "")
     setValue("price", 0)
@@ -99,6 +108,7 @@ export default function PostModal({ categories }: PostModalProps) {
                       <Input
                         {...field}
                         id="price"
+                        type="number"
                         placeholder="Digite o valor do produto..."
                         required
                       />

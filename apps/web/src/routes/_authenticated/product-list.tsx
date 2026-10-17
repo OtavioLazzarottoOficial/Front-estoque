@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
+import { Toggle } from "@workspace/ui/components/toggle"
 
 export const Route = createFileRoute("/_authenticated/product-list")({
   component: ProductList,
@@ -107,7 +108,9 @@ function ProductList() {
                 <TableCell>{product.sku}</TableCell>
                 <TableCell>R$ {product.price}</TableCell>
                 <TableCell>
-                  {product.status === "ACTIVE" ? "Ativo" : "Inativo"}
+                  <Toggle variant={"outline"} aria-label="Toggle default">
+                    {product.status === "ACTIVE" ? "Ativo" : "Inativo"}
+                  </Toggle>
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
