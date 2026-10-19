@@ -1,0 +1,36 @@
+### AUTHENTICATION REQUESTS ###
+
+POST http://localhost:3333/auth HTTP/1.1
+content-type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "@Opassword123a"
+}
+
+
+### CREATE USER REQUESTS ###
+
+POST http://localhost:3333/users HTTP/1.1
+content-type: application/json
+
+{
+    "name": "John Doe",
+    "email": "user@example.com",
+    "password": "@Opassword123a",
+    "role": "ADMIN"
+}
+
+
+### FETCH USER REQUESTS ###
+
+GET http://localhost:3333/users?page=1 HTTP/1.1
+content-type: application/json
+Authorization: Bearer <eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjp7InZhbHVlIjoiY2IxODM4ZjUtNzYxNi00NmVkLWFhMzUtM2FkZjZiYWRmMDgwIn0sInVzZXJfZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzkyMzQ1OTQ5fQ.KQDfd_IuU7Y6bOJJQrRPqm5xKVjH1jhQ3Di57Lt5370Fl7n9yzjuFRhXg3YxCMOhpJEW-PRdEgb0noXXHRImo87511iNA2VvXsUzEClMMgWvndXkXe_5k59-H-U_VDhF9FTFFPP7tJiSbXzIgDPPaIewR4V08HhKCv_zxGuWU67RgnqwE6bvQTgqx4HumC550rfqLesNyiEL2k24vutj1gdAxVK6gHckt3vUs1W4kE1XkK9OqjGB6f57vNEkDS1KIWh920qrSVhrDj54TJWwyx5iJq3mpX1fCJOqTkp2ZQJFIzOGQueiy0pwxO-Wcn_PLTNJjeYbJfvfZ47zFWwH1g>
+
+
+
+### DELETE PRODUCT REQUESTS ###
+
+DELETE  http://localhost:3333/product/delete/32a75278-f369-4ed6-9904-84c11de91002 HTTP/1.1
+content-type: application/json

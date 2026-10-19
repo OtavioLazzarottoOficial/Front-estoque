@@ -1,4 +1,4 @@
-import { postProduct } from "@/hooks/useFetchProducts"
+import { postProduct } from "@/hooks/useProducts"
 import type { CategoryProps } from "@/types/category"
 import { Button } from "@workspace/ui/components/button"
 import { useMutation, useQuery } from "@tanstack/react-query"

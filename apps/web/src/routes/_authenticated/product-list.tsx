@@ -1,25 +1,34 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 
 import type { ProductProps } from "@/types/product"
 
 import PaginationComponent from "@/components/pagination-component"
-import { fetchProducts } from "@/hooks/useFetchProducts"
+import { deleteProduct, fetchProducts } from "@/hooks/useProducts"
 import { Field } from "@workspace/ui/components/field"
 import { ButtonGroup } from "@workspace/ui/components/button-group"
 import { Input } from "@workspace/ui/components/input"
 import { Button } from "@workspace/ui/components/button"
 import { ListTable } from "@/components/list-table"
-import { MoreHorizontalIcon, Search } from "lucide-react"
+import {
+  EyeIcon,
+  MoreHorizontalIcon,
+  PencilIcon,
+  PlusIcon,
+  Search,
+  TrashIcon,
+} from "lucide-react"
 import PostModal from "@/components/post-modal"
-import { fetchCategories } from "@/hooks/useFetchCategories"
+import { fetchCategories } from "@/hooks/useCategories"
 import { TableCell, TableRow } from "@workspace/ui/components/table"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuGroup,
+  DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu"
 import {
   Select,
@@ -43,6 +52,16 @@ function ProductList() {
     queryKey: ["categories"],
     queryFn: async () => await fetchCategories(),
   })
+
+  const { mutate } = useMutation({
+    mutationKey: ["deleteProduct"],
+    mutationFn: async (id: string) => deleteProduct(id),
+  })
+
+  const handleDelete = (id: string) => {
+    mutate(id)
+  }
+
   return (
     <div className="flex min-h-svh justify-center p-6">
       <div className="flex w-[70%] flex-col gap-4 text-sm leading-loose">
@@ -116,17 +135,47 @@ function ProductList() {
                   <DropdownMenu>
                     <DropdownMenuTrigger
                       render={
-                        <Button variant="ghost" size="icon" className="size-8">
+                        <Button variant="link" size="icon" className="size-8">
                           <MoreHorizontalIcon />
-                          <span className="sr-only">Open menu</span>
+                          <span className="sr-only">Abrir menu</span>
                         </Button>
                       }
                     />
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem variant="destructive">
-                        Deletar
-                      </DropdownMenuItem>
+                    <DropdownMenuContent align="start" sideOffset={4}>
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem className="cursor-pointer">
+                          <PencilIcon />
+                          Editar
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(product.id)}
+                        >
+                          <TrashIcon />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <Link
+                          to="/view-stock/product/$productId"
+                          params={{ productId: product.id }}
+                        >
+                          <DropdownMenuItem className="cursor-pointer">
+                            <PlusIcon />
+                            Adicionar estoque
+                          </DropdownMenuItem>
+                        </Link>
+                        <Link
+                          to="/view-stock/product/$productId"
+                          params={{ productId: product.id }}
+                        >
+                          <DropdownMenuItem className="cursor-pointer">
+                            <EyeIcon />
+                            Ver estoque
+                          </DropdownMenuItem>
+                        </Link>
+                      </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

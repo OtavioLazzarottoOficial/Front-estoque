@@ -37,6 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(getInitialUser)
 
   function login(token: string) {
+    console.log("Token received:", token) // Log the token for debugging
+
     localStorage.setItem("token", token)
     const decoded = jwtDecode<User>(token)
     setUser(decoded)

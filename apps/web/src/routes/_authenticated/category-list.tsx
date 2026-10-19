@@ -1,7 +1,7 @@
 import { ListTable } from "@/components/list-table"
 import PaginationComponent from "@/components/pagination-component"
 import PostCategoryModal from "@/components/post-category-modal"
-import { fetchCategories } from "@/hooks/useFetchCategories"
+import { fetchCategories } from "@/hooks/useCategories"
 import { createFileRoute } from "@tanstack/react-router"
 import { Button } from "@workspace/ui/components/button"
 import { ButtonGroup } from "@workspace/ui/components/button-group"

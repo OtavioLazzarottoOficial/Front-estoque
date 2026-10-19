@@ -5,7 +5,13 @@ export async function fetchCategories(
 ): Promise<CategoryProps[] | undefined> {
   try {
     const response = await fetch(
-      `http://localhost:3333/categories?page=${page}`
+      `http://localhost:3333/categories?page=${page}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+      }
     )
 
     return response.json()

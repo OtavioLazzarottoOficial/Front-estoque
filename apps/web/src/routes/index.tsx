@@ -29,7 +29,7 @@ function Login() {
   })
 
   const { mutate, data: token } = useMutation<
-    Token | undefined,
+    string | undefined,
     Error,
     Authenticate
   >({
@@ -44,8 +44,9 @@ function Login() {
 
     if (token) {
       localStorage.setItem("token", JSON.stringify(token.access_token))
-      alert("Login successful!")
+
       navigate({ to: "/dashboard" })
+      alert("Login successful!")
     } else {
       alert("Login failed. Please check your credentials.")
     }
@@ -53,67 +54,65 @@ function Login() {
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <div className="flex w-xl gap-4">
+      <form className="flex h-auto w-xl" onSubmit={handleSubmit(onSubmit)}>
         <Card className="w-full">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <CardHeader>
-              <CardTitle>Faça seu login</CardTitle>
-              <CardDescription>
-                Entre com seu e-mail e senha para acessar o sistema!
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Controller
-                    name="email"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        id="email"
-                        type="email"
-                        placeholder="m@example.com"
-                        required
-                      />
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Senha</Label>
-                    <a
-                      href="#"
-                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                    >
-                      Esqueceu sua senha?
-                    </a>
-                  </div>
-                  <Controller
-                    name="password"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        id="password"
-                        type="password"
-                        placeholder="********"
-                        required
-                      />
-                    )}
-                  />
-                </div>
+          <CardHeader className="space-y-2">
+            <CardTitle>Faça seu login</CardTitle>
+            <CardDescription>
+              Entre com seu e-mail e senha para acessar o sistema!
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="gap-4">
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-4">
+                <Label htmlFor="email">Email</Label>
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      required
+                    />
+                  )}
+                />
               </div>
-            </CardContent>
-            <CardFooter className="flex-col gap-2">
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-            </CardFooter>
-          </form>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Senha</Label>
+                  <a
+                    href="#"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  >
+                    Esqueceu sua senha?
+                  </a>
+                </div>
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="password"
+                      type="password"
+                      placeholder="********"
+                      required
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex-col space-y-2">
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
+          </CardFooter>
         </Card>
-      </div>
+      </form>
     </div>
   )
 }

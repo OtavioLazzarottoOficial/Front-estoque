@@ -15,6 +15,7 @@ import { Route as AuthenticatedCategoryListRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProductListRouteImport } from './routes/_authenticated/product-list'
 import { Route as AuthenticatedStockListRouteImport } from './routes/_authenticated/stock-list'
+import { Route as AuthenticatedViewStockProductProductIdRouteImport } from './routes/_authenticated/view-stock.product.$productId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,6 +48,12 @@ const AuthenticatedStockListRoute = AuthenticatedStockListRouteImport.update({
   path: '/stock-list',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedViewStockProductProductIdRoute =
+  AuthenticatedViewStockProductProductIdRouteImport.update({
+    id: '/view-stock/product/$productId',
+    path: '/view-stock/product/$productId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/product-list': typeof AuthenticatedProductListRoute
   '/stock-list': typeof AuthenticatedStockListRoute
+  '/view-stock/product/$productId': typeof AuthenticatedViewStockProductProductIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,6 +69,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/product-list': typeof AuthenticatedProductListRoute
   '/stock-list': typeof AuthenticatedStockListRoute
+  '/view-stock/product/$productId': typeof AuthenticatedViewStockProductProductIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,13 +79,25 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/product-list': typeof AuthenticatedProductListRoute
   '/_authenticated/stock-list': typeof AuthenticatedStockListRoute
+  '/_authenticated/view-stock/product/$productId': typeof AuthenticatedViewStockProductProductIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/category-list' | '/dashboard' | '/product-list' | '/stock-list'
+    | '/'
+    | '/category-list'
+    | '/dashboard'
+    | '/product-list'
+    | '/stock-list'
+    | '/view-stock/product/$productId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/category-list' | '/dashboard' | '/product-list' | '/stock-list'
+  to:
+    | '/'
+    | '/category-list'
+    | '/dashboard'
+    | '/product-list'
+    | '/stock-list'
+    | '/view-stock/product/$productId'
   id:
     | '__root__'
     | '/'
@@ -85,6 +106,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/product-list'
     | '/_authenticated/stock-list'
+    | '/_authenticated/view-stock/product/$productId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStockListRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/view-stock/product/$productId': {
+      id: '/_authenticated/view-stock/product/$productId'
+      path: '/view-stock/product/$productId'
+      fullPath: '/view-stock/product/$productId'
+      preLoaderRoute: typeof AuthenticatedViewStockProductProductIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -144,6 +173,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProductListRoute: typeof AuthenticatedProductListRoute
   AuthenticatedStockListRoute: typeof AuthenticatedStockListRoute
+  AuthenticatedViewStockProductProductIdRoute: typeof AuthenticatedViewStockProductProductIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -151,6 +181,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProductListRoute: AuthenticatedProductListRoute,
   AuthenticatedStockListRoute: AuthenticatedStockListRoute,
+  AuthenticatedViewStockProductProductIdRoute:
+    AuthenticatedViewStockProductProductIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

@@ -1,4 +1,4 @@
-import { postCategory } from "@/hooks/useFetchCategories"
+import { postCategory } from "@/hooks/useCategories"
 import { Button } from "@workspace/ui/components/button"
 import { useMutation } from "@tanstack/react-query"
 
