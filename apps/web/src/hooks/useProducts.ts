@@ -39,11 +39,3 @@ export async function postProduct(
     return undefined
   }
 }
-
-export async function deleteProduct(id: string): Promise<void> {
-  try {
-    await api.delete(`/product/delete/${id}`)
-  } catch (error) {
-    console.error(error)
-  }
-}

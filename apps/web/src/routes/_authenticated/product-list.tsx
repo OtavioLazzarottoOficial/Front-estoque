@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 
 import type { ProductProps } from "@/types/product"
 
 import PaginationComponent from "@/components/pagination-component"
-import { deleteProduct, fetchProducts } from "@/hooks/useProducts"
+import { fetchProducts } from "@/hooks/useProducts"
 import { Field } from "@workspace/ui/components/field"
 import { ButtonGroup } from "@workspace/ui/components/button-group"
 import { Input } from "@workspace/ui/components/input"
@@ -39,6 +39,9 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { Toggle } from "@workspace/ui/components/toggle"
+import { Spinner } from "@workspace/ui/components/spinner"
+import { useDeleteProduct } from "@/hooks/useDeleteProduct"
+import { SkeletonTable } from "@/components/skeleton-table"
 
 export const Route = createFileRoute("/_authenticated/product-list")({
   component: ProductList,
@@ -47,21 +50,16 @@ export const Route = createFileRoute("/_authenticated/product-list")({
 
 function ProductList() {
   const products: ProductProps[] = Route.useLoaderData()
+  const { mutate, isPending } = useDeleteProduct()
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => await fetchCategories(),
   })
 
-  const { mutate } = useMutation({
-    mutationKey: ["deleteProduct"],
-    mutationFn: async (id: string) => deleteProduct(id),
-  })
-
   const handleDelete = (id: string) => {
     mutate(id)
   }
-
   return (
     <div className="flex min-h-svh justify-center p-6">
       <div className="flex w-[70%] flex-col gap-4 text-sm leading-loose">
@@ -108,80 +106,88 @@ function ProductList() {
         </div>
 
         <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-2 shadow-lg">
-          <ListTable
-            data={products}
-            headers={[
-              "Nome",
-              "Descrição",
-              "Categoria",
-              "SKU",
-              "Preço",
-              "Status",
-            ]}
-            emptyMessage="Nenhum produto cadastrado!"
-            renderRow={(product) => (
-              <TableRow key={product.id}>
-                <TableCell className="p-4">{product.name}</TableCell>
-                <TableCell>{product.description.substring(0, 20)}...</TableCell>
-                <TableCell>{product.category?.name}</TableCell>
-                <TableCell>{product.sku}</TableCell>
-                <TableCell>R$ {product.price}</TableCell>
-                <TableCell>
-                  <Toggle variant={"outline"} aria-label="Toggle default">
-                    {product.status === "ACTIVE" ? "Ativo" : "Inativo"}
-                  </Toggle>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button variant="link" size="icon" className="size-8">
-                          <MoreHorizontalIcon />
-                          <span className="sr-only">Abrir menu</span>
-                        </Button>
-                      }
-                    />
-                    <DropdownMenuContent align="start" sideOffset={4}>
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem className="cursor-pointer">
-                          <PencilIcon />
-                          Editar
-                        </DropdownMenuItem>
+          {isPending ? (
+            <SkeletonTable length={6} />
+          ) : (
+            <ListTable
+              data={products}
+              headers={[
+                "Nome",
+                "Descrição",
+                "Categoria",
+                "SKU",
+                "Preço",
+                "Status",
+              ]}
+              emptyMessage="Nenhum produto cadastrado!"
 
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(product.id)}
-                        >
-                          <TrashIcon />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <Link
-                          to="/view-stock/product/$productId"
-                          params={{ productId: product.id }}
-                        >
+              renderRow={(product) => (
+                <TableRow key={product.id}>
+                  <TableCell className="p-4">{product.name}</TableCell>
+                  <TableCell>
+                    {product.description.substring(0, 20)}...
+                  </TableCell>
+                  <TableCell>{product.category?.name}</TableCell>
+                  <TableCell>{product.sku}</TableCell>
+                  <TableCell>R$ {product.price}</TableCell>
+                  <TableCell>
+                    <Toggle variant={"outline"} aria-label="Toggle default">
+                      {product.status === "ACTIVE" ? "Ativo" : "Inativo"}
+                    </Toggle>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button variant="link" size="icon" className="size-8">
+                            <MoreHorizontalIcon />
+                            <span className="sr-only">Abrir menu</span>
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent align="start" sideOffset={4}>
+                        <DropdownMenuGroup>
                           <DropdownMenuItem className="cursor-pointer">
-                            <PlusIcon />
-                            Adicionar estoque
+                            <PencilIcon />
+                            Editar
                           </DropdownMenuItem>
-                        </Link>
-                        <Link
-                          to="/view-stock/product/$productId"
-                          params={{ productId: product.id }}
-                        >
-                          <DropdownMenuItem className="cursor-pointer">
-                            <EyeIcon />
-                            Ver estoque
+
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => handleDelete(product.id)}
+                          >
+                            <TrashIcon />
+                            Delete
                           </DropdownMenuItem>
-                        </Link>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            )}
-          />
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <Link
+                            to="/view-stock/product/$productId"
+                            params={{ productId: product.id }}
+                          >
+                            <DropdownMenuItem className="cursor-pointer">
+                              <PlusIcon />
+                              Adicionar estoque
+                            </DropdownMenuItem>
+                          </Link>
+                          <Link
+                            to="/view-stock/product/$productId"
+                            params={{ productId: product.id }}
+                          >
+                            <DropdownMenuItem className="cursor-pointer">
+                              <EyeIcon />
+                              Ver estoque
+                            </DropdownMenuItem>
+                          </Link>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              )}
+            />
+          )}
         </div>
 
         <PaginationComponent />

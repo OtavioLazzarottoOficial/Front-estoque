@@ -33,7 +33,8 @@ import { Controller, useForm, type SubmitHandler } from "react-hook-form"
 import { productFormZodSchema } from "@/schemas/productFormZodSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Product } from "@/models/product-model"
-import { useNavigate } from "@tanstack/react-router"
+import { useInsertProduct } from "@/hooks/useInsertProduct"
+import { SpinnerButton } from "./spinner-button"
 interface PostModalProps {
   categories?: CategoryProps[] | undefined
 }
@@ -42,21 +43,7 @@ export default function PostModal({ categories }: PostModalProps) {
   const { control, handleSubmit, setValue } = useForm<Product>({
     resolver: zodResolver(productFormZodSchema),
   })
-
-  const navigate = useNavigate()
-
-  const { refetch } = useQuery({
-    queryKey: ["products"],
-  })
-
-  const { mutate } = useMutation({
-    mutationKey: ["postProduct"],
-    mutationFn: async (data: Product) => await postProduct(data),
-    onSuccess: () => {
-      navigate({ to: "/product-list" })
-      refetch()
-    },
-  })
+  const { mutate, isPending } = useInsertProduct()
 
   const onSubmit: SubmitHandler<Product> = (data) => {
     mutate(data)
@@ -213,7 +200,11 @@ export default function PostModal({ categories }: PostModalProps) {
               </FieldGroup>
             </FieldSet>
             <Field orientation="horizontal">
-              <Button type="submit">Cadastrar</Button>
+              {isPending ? (
+                <SpinnerButton />
+              ) : (
+                <Button type="submit">Cadastrar</Button>
+              )}
               <DialogClose
                 render={
                   <Button variant={"outline"} type="button">
