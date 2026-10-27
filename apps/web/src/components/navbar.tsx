@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router"
 
-import { Button } from "@workspace/ui/components/button"
+import { buttonVariants } from "@workspace/ui/components/button"
 import { UserSetting } from "./user-setting"
 import { useAuth } from "@/auth/auth"
 import { Boxes, FolderTree, LayoutDashboard, PackageSearch } from "lucide-react"
@@ -28,24 +28,15 @@ function Navbar() {
           </h1>
         </div>
 
-        <nav className="flex items-center gap-1">
+        <nav aria-label="Navegação principal" className="flex items-center gap-1">
           {navLinks.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
-              activeProps={{
-                className:
-                  "bg-accent text-accent-foreground shadow-sm",
-              }}
-              activeOptions={{ exact: false }}
+              className={`${buttonVariants({ variant: "ghost" })} flex items-center gap-2 font-medium data-[status=active]:bg-secondary data-[status=active]:text-secondary-foreground`}
             >
-              <Button
-                variant="ghost"
-                className="flex items-center gap-2 font-medium"
-              >
-                <Icon className="h-4 w-4" />
-                <span className="hidden md:inline">{label}</span>
-              </Button>
+              <Icon className="h-4 w-4" />
+              <span className="hidden md:inline">{label}</span>
             </Link>
           ))}
         </nav>

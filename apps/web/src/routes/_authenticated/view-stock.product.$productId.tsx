@@ -52,7 +52,17 @@ function RouteComponent() {
                       {stock?.product?.name}
                     </TableCell>
                     <TableCell>
-                      <img src={stock?.product?.images} alt="" />
+                      {stock?.product?.images?.[0]?.url ? (
+                        <img
+                          src={stock.product.images[0].url}
+                          alt={stock?.product?.name ?? "Imagem do produto"}
+                          className="h-10 w-10 rounded-md border object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          Sem imagem
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>{stock?.quantityInStock}</TableCell>
                     <TableCell>{stock?.quantityMax}</TableCell>

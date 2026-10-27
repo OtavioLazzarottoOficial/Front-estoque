@@ -7,8 +7,6 @@ export async function fetchProducts(
 ): Promise<ProductProps[] | undefined> {
   try {
     const response = await api.get<ProductProps[]>(`/products?page=${page}`)
-
-    console.log(response.data[0].images)
     return response.data
   } catch (error) {
     console.error(error)

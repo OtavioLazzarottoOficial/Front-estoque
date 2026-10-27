@@ -3,6 +3,7 @@ import type { Stock } from "@/models/stock-model"
 import type { StockProps } from "@/types/stock"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "@tanstack/react-router"
+import { toast } from "@workspace/ui/components/toast"
 import type { AxiosError } from "axios"
 
 async function insertStock(stock: Stock): Promise<StockProps | undefined> {
@@ -11,10 +12,13 @@ async function insertStock(stock: Stock): Promise<StockProps | undefined> {
 
     return response.data
   } catch (error) {
-    alert(
-      (error as AxiosError<{ message?: string }>).response?.data.message ||
-        "An error occurred"
-    )
+    toast.add({
+      title: "Erro ao cadastrar estoque",
+      description:
+        (error as AxiosError<{ message?: string }>).response?.data.message ||
+        "Não foi possível cadastrar o estoque. Tente novamente.",
+      type: "error",
+    })
     throw error
   }
 }
@@ -27,7 +31,7 @@ export function useInsertStock() {
     mutationFn: async (stock: Stock) => await insertStock(stock),
     mutationKey: ["insertStock"],
     onSuccess: async () => {
-      alert("Estoque cadastrado com sucesso.")
+      toast.add({ title: "Estoque cadastrado com sucesso.", type: "success" })
 
       // 1. Invalida o cache do TanStack Query (incluindo sub-chaves como paginação/filtros)
       await queryClient.invalidateQueries({
@@ -39,10 +43,13 @@ export function useInsertStock() {
       await router.invalidate()
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      const errorMessage =
-        error.response?.data?.message ||
-        "Erro ao cadastrar estoque. Tente novamente."
-      alert("Teste: ")
+      toast.add({
+        title: "Erro ao cadastrar estoque",
+        description:
+          error.response?.data?.message ||
+          "Erro ao cadastrar estoque. Tente novamente.",
+        type: "error",
+      })
     },
   })
 }

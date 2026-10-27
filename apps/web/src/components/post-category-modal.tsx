@@ -1,16 +1,22 @@
+import { useState } from "react"
 import { postCategory } from "@/hooks/useCategories"
 import { Button } from "@workspace/ui/components/button"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "@workspace/ui/components/toast"
 
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog"
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldLegend,
@@ -18,50 +24,85 @@ import {
 } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
 
-import { Plus } from "lucide-react"
+import { Plus, Loader2 } from "lucide-react"
 
-import { Controller, useForm } from "react-hook-form"
-import { useNavigate } from "@tanstack/react-router"
+import { Controller, useForm, type Resolver, type SubmitHandler } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { categoryFormZodSchema } from "@/schemas/categoryFormZodSchema"
+
+type CategoryFormValues = {
+  name: string
+  description: string
+}
 
 export default function PostCategoryModal() {
-  const { control, handleSubmit, setValue } = useForm()
+  const [open, setOpen] = useState(false)
+  const queryClient = useQueryClient()
 
-  const navigate = useNavigate()
+  const {
+    control,
+    handleSubmit,
+    reset,
+  } = useForm<CategoryFormValues>({
+    resolver: zodResolver(categoryFormZodSchema) as Resolver<CategoryFormValues>,
+    defaultValues: { name: "", description: "" },
+  })
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["postCategory"],
-    mutationFn: async (data) => await postCategory(data),
+    mutationFn: async (data: CategoryFormValues) => await postCategory(data),
 
-    onSuccess: () => {
-      alert("Categoria cadastrada com sucesso!")
-      navigate({ to: "/category-list" })
+    onSuccess: async () => {
+      toast.add({ title: "Categoria cadastrada com sucesso!", type: "success" })
+      await queryClient.invalidateQueries({
+        queryKey: ["categories"],
+        exact: false,
+      })
+      reset()
+      setOpen(false)
     },
     onError: (error) => {
       console.error("Erro ao cadastrar categoria:", error)
+      toast.add({
+        title: "Erro ao cadastrar categoria",
+        description: "Verifique os dados e tente novamente.",
+        type: "error",
+      })
     },
   })
 
-  function onSubmit(data) {
+  const onSubmit: SubmitHandler<CategoryFormValues> = (data) => {
     mutate(data)
-    setValue("name", "")
-    setValue("description", "")
   }
+
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen)
+        if (!nextOpen) reset()
+      }}
+    >
       <DialogTrigger
         render={
-          <Button className={"font-extrabold"} variant={"default"}>
-            Adicionar <Plus color="white" />
+          <Button className="font-medium">
+            Adicionar <Plus />
           </Button>
         }
       />
 
       <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Cadastrar categoria</DialogTitle>
+          <DialogDescription>
+            Preencha os campos abaixo para criar uma nova categoria.
+          </DialogDescription>
+        </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             <FieldSet>
-              <FieldLegend>Cadastrar Categoria</FieldLegend>
-              <FieldDescription>
+              <FieldLegend className="sr-only">Dados da categoria</FieldLegend>
+              <FieldDescription className="sr-only">
                 Preencha todos os campos com informações da categoria
               </FieldDescription>
               <FieldGroup>
@@ -75,8 +116,12 @@ export default function PostCategoryModal() {
                         {...field}
                         id="name"
                         placeholder="Nome da categoria..."
-                        required
+                        aria-invalid={fieldState.invalid}
+                        disabled={isPending}
                       />
+                      {fieldState.error ? (
+                        <FieldError errors={[fieldState.error]} />
+                      ) : null}
                     </Field>
                   )}
                 />
@@ -90,8 +135,12 @@ export default function PostCategoryModal() {
                         {...field}
                         id="description"
                         placeholder="Descrição da categoria..."
-                        required
+                        aria-invalid={fieldState.invalid}
+                        disabled={isPending}
                       />
+                      {fieldState.error ? (
+                        <FieldError errors={[fieldState.error]} />
+                      ) : null}
                     </Field>
                   )}
                 />
@@ -99,10 +148,19 @@ export default function PostCategoryModal() {
             </FieldSet>
 
             <Field orientation="horizontal">
-              <Button type="submit">Cadastrar</Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Cadastrando...
+                  </>
+                ) : (
+                  "Cadastrar"
+                )}
+              </Button>
               <DialogClose
                 render={
-                  <Button variant={"outline"} type="button">
+                  <Button variant={"outline"} type="button" disabled={isPending}>
                     Cancelar
                   </Button>
                 }

@@ -1,8 +1,9 @@
+import type { ReactNode } from "react"
 import { Toaster } from "@workspace/ui/components/toast"
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body>
         <main>{children}</main>
         <Toaster />

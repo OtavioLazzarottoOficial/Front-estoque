@@ -1,6 +1,7 @@
 import { api } from "@/helpers/api"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "@tanstack/react-router"
+import { toast } from "@workspace/ui/components/toast"
 import type { AxiosError } from "axios"
 
 export async function deleteProduct(
@@ -9,10 +10,13 @@ export async function deleteProduct(
   try {
     await api.delete(`/product/delete/${id}`)
   } catch (error) {
-    alert(
-      (error as AxiosError<{ message?: string }>).response?.data.message ||
-        "An error occurred"
-    )
+    toast.add({
+      title: "Erro ao remover produto",
+      description:
+        (error as AxiosError<{ message?: string }>).response?.data.message ||
+        "Não foi possível remover o produto. Tente novamente.",
+      type: "error",
+    })
     throw error
   }
 }
@@ -25,7 +29,7 @@ export function useDeleteProduct() {
     mutationFn: (id: string) => deleteProduct(id),
     mutationKey: ["deleteProduct"],
     onSuccess: async () => {
-      alert("Produto removido com sucesso.")
+      toast.add({ title: "Produto removido com sucesso.", type: "success" })
 
       // 1. Invalida o cache do TanStack Query (incluindo sub-chaves como paginação/filtros)
       await queryClient.invalidateQueries({
@@ -37,10 +41,13 @@ export function useDeleteProduct() {
       await router.invalidate()
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      const errorMessage =
-        error.response?.data?.message ||
-        "Erro ao remover produto. Tente novamente."
-      alert(errorMessage)
+      toast.add({
+        title: "Erro ao remover produto",
+        description:
+          error.response?.data?.message ||
+          "Erro ao remover produto. Tente novamente.",
+        type: "error",
+      })
     },
   })
 }

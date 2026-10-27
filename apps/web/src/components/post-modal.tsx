@@ -28,7 +28,7 @@ import {
 import { Textarea } from "@workspace/ui/components/textarea"
 import { ImagePlus, Plus, X } from "lucide-react"
 
-import { Controller, useForm, type SubmitHandler } from "react-hook-form"
+import { Controller, useForm, type Resolver, type SubmitHandler } from "react-hook-form"
 import { productFormZodSchema } from "@/schemas/productFormZodSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Product } from "@/models/product-model"
@@ -53,7 +53,9 @@ export default function PostModal({ categories }: PostModalProps) {
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
 
   const { control, handleSubmit, setValue, reset } = useForm<Product>({
-    resolver: zodResolver(productFormZodSchema),
+    // z.coerce.number() faz o input do schema ser `unknown`; o cast mantém o
+    // tipo do formulário igual ao tipo de saída validado pelo Zod.
+    resolver: zodResolver(productFormZodSchema) as Resolver<Product>,
     defaultValues: {
       name: "",
       price: 0,

@@ -6,7 +6,8 @@ import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query
 import { RouterProvider, createRouter } from "@tanstack/react-router"
 import { routeTree } from "./routeTree.gen"
 import "@workspace/ui/globals.css"
-import { AuthProvider, useAuth, type AuthContextProps } from "./auth/auth"
+import { AuthProvider, useAuth } from "./auth/auth"
+import { Toaster } from "@workspace/ui/components/toast"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,22 +43,6 @@ declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router
   }
-  interface HistoryState {
-    // extend if needed
-  }
-}
-
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router
-  }
-}
-
-// Augment router context types
-declare module "@tanstack/react-router" {
-  interface RouteContext {
-    auth: AuthContextProps
-  }
 }
 
 function InnerApp() {
@@ -68,9 +53,11 @@ function InnerApp() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <InnerApp />
-      </AuthProvider>
+      <Toaster>
+        <AuthProvider>
+          <InnerApp />
+        </AuthProvider>
+      </Toaster>
       {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
     </QueryClientProvider>
   )

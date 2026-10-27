@@ -15,10 +15,9 @@ import {
   FieldSet,
 } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
-import { Controller, useForm, type SubmitHandler } from "react-hook-form"
+import { Controller, useForm, type Resolver, type SubmitHandler } from "react-hook-form"
 import { SpinnerButton } from "./spinner-button"
 import { Button } from "@workspace/ui/components/button"
-import { useState } from "react"
 import { PlusIcon } from "lucide-react"
 import type { Stock } from "@/models/stock-model"
 import { useInsertStock } from "@/hooks/useInsertStock"
@@ -33,7 +32,9 @@ export default function InsertStockModal({
   produtoName,
 }: ModalProps) {
   const { control, handleSubmit, reset } = useForm<Stock>({
-    resolver: zodResolver(stockFormZodSchema),
+    // z.coerce.number() faz o input do schema ser `unknown`; o cast mantém o
+    // tipo do formulário igual ao tipo de saída validado pelo Zod.
+    resolver: zodResolver(stockFormZodSchema) as Resolver<Stock>,
     defaultValues: {
       productId: productId,
       quantityInStock: 0,
@@ -42,9 +43,7 @@ export default function InsertStockModal({
     },
   })
 
-  const { mutate } = useInsertStock()
-
-  const [isPending, setIsPending] = useState(false)
+  const { mutate, isPending } = useInsertStock()
 
   const onSubmit: SubmitHandler<Stock> = (data) => {
     mutate(data)

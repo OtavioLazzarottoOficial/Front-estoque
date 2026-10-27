@@ -2,10 +2,11 @@ import * as React from "react"
 import { jwtDecode } from "jwt-decode"
 
 export type User = {
+  sub?: string
+  user_id?: string | { value: string }
+  user_email?: string
   iat?: number
   exp?: number
-  sub: string
-  [key: string]: unknown
 }
 
 export interface AuthContextProps {
