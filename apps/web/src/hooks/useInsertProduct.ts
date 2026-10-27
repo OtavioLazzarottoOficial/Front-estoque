@@ -1,4 +1,4 @@
-import { api } from "@/helpes/api"
+import { api } from "@/helpers/api"
 import type { Product } from "@/models/product-model"
 import type { ProductProps } from "@/types/product"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
@@ -8,16 +8,28 @@ import type { AxiosError } from "axios"
 export async function insertProduct(
   data: Product
 ): Promise<ProductProps | undefined> {
-  try {
-    const response = await api.post("/product", data)
-    return response.data
-  } catch (error) {
-    alert(
-      (error as AxiosError<{ message?: string }>).response?.data.message ||
-        "An error occurred"
-    )
-    throw error
+  const formData = new FormData()
+  formData.append("name", data.name)
+  formData.append("description", data.description)
+  formData.append("price", String(data.price))
+  formData.append("categoryId", data.categoryId)
+
+  if (data.status) {
+    formData.append("status", data.status)
   }
+
+  if (data.images && data.images.length > 0) {
+    data.images.forEach((file) => {
+      formData.append("images", file)
+    })
+  }
+
+  const response = await api.post("/product", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
+  return response.data
 }
 
 export function useInsertProduct() {
@@ -40,6 +52,7 @@ export function useInsertProduct() {
       await router.invalidate()
     },
     onError: (error: AxiosError<{ message?: string }>) => {
+      console.log(error.response?.data?.message)
       const errorMessage =
         error.response?.data?.message ||
         "Erro ao cadastrar produto. Tente novamente."

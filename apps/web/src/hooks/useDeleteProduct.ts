@@ -1,4 +1,4 @@
-import { api } from "@/helpes/api"
+import { api } from "@/helpers/api"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "@tanstack/react-router"
 import type { AxiosError } from "axios"

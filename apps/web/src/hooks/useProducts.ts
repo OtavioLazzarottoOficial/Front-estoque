@@ -1,4 +1,4 @@
-import { api } from "@/helpes/api"
+import { api } from "@/helpers/api"
 import type { Product } from "@/models/product-model"
 import type { ProductProps } from "@/types/product"
 
@@ -8,6 +8,7 @@ export async function fetchProducts(
   try {
     const response = await api.get<ProductProps[]>(`/products?page=${page}`)
 
+    console.log(response.data[0].images)
     return response.data
   } catch (error) {
     console.error(error)

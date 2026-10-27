@@ -1,14 +1,14 @@
 import * as React from "react"
 import { jwtDecode } from "jwt-decode"
-import { useState } from "react"
 
-type User = {
-  iat: number
-  user_id: string
-  user_email: string
+export type User = {
+  iat?: number
+  exp?: number
+  sub: string
+  [key: string]: unknown
 }
 
-interface AuthContextProps {
+export interface AuthContextProps {
   user: User | null
   isAuthenticated: boolean
   login: (token: string) => void
@@ -18,44 +18,95 @@ interface AuthContextProps {
 
 const AuthContext = React.createContext<AuthContextProps | null>(null)
 
-function getInitialUser(): User | null {
-  const token = localStorage.getItem("token")
-  if (!token) return null
+function getInitialUser(): { user: User | null; isLoading: boolean } {
+  try {
+    const token = localStorage.getItem("token")
+    if (!token) {
+      return { user: null, isLoading: false }
+    }
 
-  const decoded = jwtDecode<User & { exp: number }>(token)
-  const isExpired = decoded.exp * 1000 < Date.now()
+    const decoded = jwtDecode<User & { exp?: number }>(token)
 
-  if (isExpired) {
+    if (decoded.exp) {
+      const isExpired = decoded.exp * 1000 < Date.now()
+      if (isExpired) {
+        localStorage.removeItem("token")
+        return { user: null, isLoading: false }
+      }
+    }
+
+    return { user: decoded as User, isLoading: false }
+  } catch (error) {
+    console.error("Failed to decode token on initialization", error)
     localStorage.removeItem("token")
-    return null
+    return { user: null, isLoading: false }
   }
-
-  return decoded
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(getInitialUser)
+  const [{ user, isLoading }, setAuthState] = React.useState<{
+    user: User | null
+    isLoading: boolean
+  }>(() => getInitialUser())
 
-  function login(token: string) {
-    console.log("Token received:", token) // Log the token for debugging
+  const login = React.useCallback((token: string) => {
+    try {
+      if (!token) {
+        throw new Error("Token is required to login")
+      }
+      localStorage.setItem("token", token)
+      const decoded = jwtDecode<User & { exp?: number }>(token)
+      setAuthState({ user: decoded as User, isLoading: false })
+    } catch (error) {
+      console.error("Failed to login with token", error)
+      localStorage.removeItem("token")
+      setAuthState({ user: null, isLoading: false })
+    }
+  }, [])
 
-    localStorage.setItem("token", token)
-    const decoded = jwtDecode<User>(token)
-    setUser(decoded)
-  }
-
-  function logout() {
+  const logout = React.useCallback(() => {
     localStorage.removeItem("token")
-    setUser(null)
-  }
+    setAuthState({ user: null, isLoading: false })
+  }, [])
 
-  return (
-    <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, login, logout, isLoading: false }}
-    >
-      {children}
-    </AuthContext.Provider>
+  React.useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "token") {
+        if (!event.newValue) {
+          setAuthState({ user: null, isLoading: false })
+          return
+        }
+        try {
+          const decoded = jwtDecode<User & { exp?: number }>(event.newValue)
+          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+            localStorage.removeItem("token")
+            setAuthState({ user: null, isLoading: false })
+            return
+          }
+          setAuthState({ user: decoded as User, isLoading: false })
+        } catch (error) {
+          console.error("Failed to sync auth state from storage event", error)
+          localStorage.removeItem("token")
+          setAuthState({ user: null, isLoading: false })
+        }
+      }
+    }
+    window.addEventListener("storage", handleStorage)
+    return () => window.removeEventListener("storage", handleStorage)
+  }, [])
+
+  const value = React.useMemo<AuthContextProps>(
+    () => ({
+      user,
+      isAuthenticated: !!user,
+      login,
+      logout,
+      isLoading,
+    }),
+    [user, login, logout, isLoading]
   )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
